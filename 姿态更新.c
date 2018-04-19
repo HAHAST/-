@@ -2,7 +2,7 @@
 
 
 
-void POS_UPDATE(float w[3])  //姿态更新
+void updata(float w[3])  //姿态更新
 {
 	float cup0, cup1, cup2, cup3, norm;
 	cup0 = s - 0.5*(w[0]*x + w[1]*y + w[2]*z)*T;
