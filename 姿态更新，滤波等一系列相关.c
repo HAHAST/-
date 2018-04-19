@@ -1,6 +1,6 @@
 
 
-void EtoQ()  //欧拉角转四元数
+void EtoQ(float *s, float *x, float *y, float *z, float pitch, float roll, float yaw)  //欧拉角转四元数
 {
 	float norm;
 
@@ -16,7 +16,7 @@ void EtoQ()  //欧拉角转四元数
 	z = z / norm;
 }
 
-void QtoE() //四元数转欧拉角
+void QtoE(float *pitch, float *roll, float *yaw, float s, float x, float y, float z) //四元数转欧拉角
 {
 	pitch = asin(2 * (z*y + s * x));
 	yaw = atan2(2 * (z*s - y * x), (1 - 2 * x*x - 2 * z*z));
