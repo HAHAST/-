@@ -36,3 +36,8 @@ void updata(float w[3])  //姿态更新
 	y = cup2 / norm;
 	z = cup3 / norm;
 }
+
+//卡尔曼滤波 _(:з」∠)_
+void KF(){
+	
+}
