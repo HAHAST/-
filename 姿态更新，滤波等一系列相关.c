@@ -1,6 +1,27 @@
 
 
+void EtoQ()  //欧拉角转四元数
+{
+	float norm;
 
+	s = cos(roll / 2)*cos(pitch / 2)*cos(yaw / 2) - sin(yaw / 2)*sin(roll / 2)*sin(pitch / 2);
+	x = cos(roll / 2)*sin(pitch / 2)*cos(yaw / 2) - sin(roll / 2)*cos(pitch / 2)*sin(yaw / 2);
+	y = cos(roll / 2)*sin(pitch / 2)*sin(yaw / 2) + sin(roll / 2)*cos(pitch / 2)*cos(yaw / 2);
+	z = cos(roll / 2)*cos(pitch / 2)*sin(yaw / 2) + sin(roll / 2)*sin(pitch / 2)*cos(yaw / 2);
+
+	norm = sqrt(s*s + x * x + y * y + z * z);
+	s = s / norm;
+	x = x / norm;
+	y = y / norm;
+	z = z / norm;
+}
+
+void QtoE() //四元数转欧拉角
+{
+	pitch = asin(2 * (z*y + s * x));
+	yaw = atan2(2 * (z*s - y * x), (1 - 2 * x*x - 2 * z*z));
+	roll = atan2(2 * (s*y - x * z), (1 - 2 * y*y - 2 * x*x));
+}
 
 void updata(float w[3])  //姿态更新
 {
