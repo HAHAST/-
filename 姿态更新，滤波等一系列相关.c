@@ -1,4 +1,4 @@
-
+#include <math.h>
 
 void EtoQ(float *s, float *x, float *y, float *z, float pitch, float roll, float yaw)  //欧拉角转四元数
 {
