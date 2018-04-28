@@ -46,3 +46,26 @@ void KF(){
 	
 }
 */
+
+//PID部分
+
+float PID(float set, float actual, unsigned char pid_i) {
+    haha[pid_i].err2 = haha[pid_i].err1;
+	haha[pid_i].err1 = haha[pid_i].err;
+    
+	haha[pid_i].err = set - actual;
+	haha[pid_i].errint += haha[pid_i].err;
+	
+	return haha[i].kp*haha[i].err + haha[i].ki*haha[i].errint + haha[i].kd*(3 * haha[i].err - 4 * haha[i].err1 + haha[i].err2);
+}
+
+
+
+
+
+
+
+
+
+
+
