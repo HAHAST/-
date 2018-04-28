@@ -1,7 +1,12 @@
 #include <math.h>
 #include "AHRS_PID.h"
 
-void EtoQ(float *s, float *x, float *y, float *z, float pitch, float roll, float yaw)  //欧拉角转四元数
+//四轴姿态参数
+float s = 1, x = 0, y = 0, z = 0;  //四元数 
+float pitch = 0, yaw = 0, roll = 0; 
+float w_x0 = 0, w_y0 = 0, w_z0 = 0; 
+
+void EtoQ()  //欧拉角转四元数
 {
 	float norm;
 
@@ -18,7 +23,7 @@ void EtoQ(float *s, float *x, float *y, float *z, float pitch, float roll, float
 }
 
 //四元数转欧拉角
-void QtoE(float *pitch, float *roll, float *yaw, float s, float x, float y, float z){
+void QtoE(){
 	pitch = asin(2 * (z*y + s * x));
 	yaw = atan2(2 * (z*s - y * x), (1 - 2 * x*x - 2 * z*z));
 	roll = atan2(2 * (s*y - x * z), (1 - 2 * y*y - 2 * x*x));
@@ -26,7 +31,7 @@ void QtoE(float *pitch, float *roll, float *yaw, float s, float x, float y, floa
 
 
 //姿态更新
-void updata(mpu9255_data dth, float dt){
+void updata(, float dt){
     float cup0, cup1, cup2, cup3, norm;
 	
     cup0 = s - 0.5*(w[0]*x + w[1]*y + w[2]*z)*dt;
@@ -40,6 +45,34 @@ void updata(mpu9255_data dth, float dt){
 	z = cup3 / norm;
 }
 
+//互补滤波（真的吗）
+void COM_FILT(float a_x, float a_y, float a_z, float w_x, float w_y, float w_z, float w[3])
+{
+	float e_x, e_y, e_z;
+	float g_x, g_y, g_z;
+	float norm;
+
+	norm = sqrt(a_y*a_y + a_x*a_x + a_z*a_z);
+	a_x = a_x / norm;
+	a_y = a_y / norm;
+	a_z = a_z / norm; 
+
+	g_x = 2 * (x*z - s*y);
+	g_y = 2 * (y*z + s*x);
+	g_z = 1 - 2 * (x*x + y*y);   
+
+	e_x = a_y*g_z - a_z*g_y;
+	e_y = a_z*g_x - a_x*g_z;
+	e_z = a_x*g_y - a_y*g_x;
+
+	eInt_x = eInt_x + e_x*Ki;
+	eInt_y = eInt_y + e_y*Ki;
+	eInt_z = eInt_z + e_z*Ki;
+
+	w[0] = w_x + Kp*e_x + eInt_x;
+	w[1] = w_y + Kp*e_y + eInt_y;
+	w[2] = w_z + Kp*e_z + eInt_z;
+}
 /*
 //卡尔曼滤波 _(:з」∠)_
 void KF(){
@@ -47,20 +80,45 @@ void KF(){
 }
 */
 
-//PID部分
+//PID部分--------------------------------------------------
 
-float PID(float set, float actual, unsigned char pid_i) {
-    haha[pid_i].err2 = haha[pid_i].err1;
-	haha[pid_i].err1 = haha[pid_i].err;
+typedef struct{
+	float kp, ki, kd;
+	float err, err1, err2;
+	float errint;
+}PIDparameter;
+
+PIDparameter pid_data[] = {
+//   kp  ki  kd
+	{0.8, 0, 0, 0, 0, 0, 0}, //内环pitch
+	{0.8, 0, 0, 0, 0, 0, 0}, //内环roll
+	{0.8, 0, 0, 0, 0, 0, 0}, //内环yaw
+	{0.8, 0, 0, 0, 0, 0, 0}, //外环机体坐标x方向角速度
+	{0.8, 0, 0, 0, 0, 0, 0}, //外环机体坐标y方向角速度
+	{0.8, 0, 0, 0, 0, 0, 0}  //外环机体坐标z方向角速度
+};
+
+float PID(float set, float actual, PIDparameter haha) {
+    haha.err2 = haha.err1;
+	haha.err1 = haha.err;
     
-	haha[pid_i].err = set - actual;
-	haha[pid_i].errint += haha[pid_i].err;
+	haha.err = set - actual;
+	haha.errint += haha.err;
 	
-	return haha[i].kp*haha[i].err + haha[i].ki*haha[i].errint + haha[i].kd*(3 * haha[i].err - 4 * haha[i].err1 + haha[i].err2);
+	return haha.kp*haha.err + haha.ki*haha.errint + haha.kd*(3 * haha.err - 4 * haha.err1 + haha.err2);
 }
 
 
+float pid_out[3]={0,0,0};
 
+float *pid_motor(float *set, float *actual, PIDparameter pid_value[]){
+    unsigned char i=0;
+    for (i=0; i<3; i++){
+        pid_out[i] = PID(PID(set[i], actual[i], pid_value[i]),
+                         w[i], pid_value[i+3]);
+    }
+    return pid_out;
+}
 
 
 
