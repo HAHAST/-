@@ -2,9 +2,18 @@
 #include "AHRS_PID.h"
 
 //四轴姿态参数
+
+typedef struct mpu9255_data_struct{
+    float x;
+    float y;
+    float z;
+}mpu9255_data;
+
+
 float s = 1, x = 0, y = 0, z = 0;  //四元数 
 float pitch = 0, yaw = 0, roll = 0; 
 float w_x0 = 0, w_y0 = 0, w_z0 = 0; 
+float w[3] = {0, 0, 0};         
 
 void EtoQ()  //欧拉角转四元数
 {
@@ -31,7 +40,7 @@ void QtoE(){
 
 
 //姿态更新
-void updata(, float dt){
+void updata(float dt){
     float cup0, cup1, cup2, cup3, norm;
 	
     cup0 = s - 0.5*(w[0]*x + w[1]*y + w[2]*z)*dt;
@@ -46,7 +55,7 @@ void updata(, float dt){
 }
 
 //互补滤波（真的吗）
-void COM_FILT(float a_x, float a_y, float a_z, float w_x, float w_y, float w_z, float w[3])
+void COM_FILT(mpu9255_data accel, mpu9255_data gyro)
 {
 	float e_x, e_y, e_z;
 	float g_x, g_y, g_z;
@@ -111,7 +120,7 @@ float PID(float set, float actual, PIDparameter haha) {
 
 float pid_out[3]={0,0,0};
 
-float *pid_motor(float *set, float *actual, PIDparameter pid_value[]){
+void pid_motor(float *set, float *actual, PIDparameter pid_value[]){
     unsigned char i=0;
     for (i=0; i<3; i++){
         pid_out[i] = PID(PID(set[i], actual[i], pid_value[i]),
@@ -121,7 +130,18 @@ float *pid_motor(float *set, float *actual, PIDparameter pid_value[]){
 }
 
 
-
+float *AHRS(mpu9255_data accel, mpu9255_data gyro, PIDparameter pid_QAQ, float th_set[], float dt){
+    float th[3];
+    COM_FILT(accel, gyro);
+    updata(dt);
+    QtoE();
+    
+    th[0] = pitch;
+    th[1] = roll;
+    th[0] = yaw;
+    
+    return pid_out(th_set, th, pid_QAQ);
+}
 
 
 
