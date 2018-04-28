@@ -1,22 +1,30 @@
+typedef struct mpu9255_data_struct{
+    float x;
+    float y;
+    float z;
+}mpu9255_data;
 
+mpu9255_data *accel;
+mpu9255_data *gyro;
+mpu9255_data *mag;
 
 void init_AHRS(float dt, float gx, float gy, float gz, float dthx, float dthy, float dthz);
-//»ñÈ¡³õÊ¼ËÄÔªÊı,µÚÒ»¸ö²ÎÊıÎªÊ±»ù
+//è·å–åˆå§‹å››å…ƒæ•°,ç¬¬ä¸€ä¸ªå‚æ•°ä¸ºæ—¶åŸº
 
 
 void AHRS_getdata(unsigned char *set, float gx, float gy, float gz, float dthx, float dthy, float dthz);
-//½«MPU9255,Ò£¿ØµÄÊı¾İ´«ÈëAHRS£¬µÚÒ»¸ö²ÎÊı´«ÈëNRFÊı×é£¬2-4´«ÈëMPUµÄ¼ÓËÙ¶È£¬×îºóÈı¸ö´«ÈëMPUµÄ½ÇËÙ¶È
+//å°†MPU9255,é¥æ§çš„æ•°æ®ä¼ å…¥AHRSï¼Œç¬¬ä¸€ä¸ªå‚æ•°ä¼ å…¥NRFæ•°ç»„ï¼Œ2-4ä¼ å…¥MPUçš„åŠ é€Ÿåº¦ï¼Œæœ€åä¸‰ä¸ªä¼ å…¥MPUçš„è§’é€Ÿåº¦
 
 
 
 void PID_K(float *kp, float *ki, float *kd);
-//´«ÈëPIDµÄÈı¸ö²ÎÊıkp, ki, kdÎªÊı×é£¬6¸öÔªËØ£¬·Ö±ğÎªÄÚ»·µÄºÍÍâ»·µÄ
+//ä¼ å…¥PIDçš„ä¸‰ä¸ªå‚æ•°kp, ki, kdä¸ºæ•°ç»„ï¼Œ6ä¸ªå…ƒç´ ï¼Œåˆ†åˆ«ä¸ºå†…ç¯çš„å’Œå¤–ç¯çš„
 
 
 void AHRS_PID(void);
-//½øĞĞ×ËÌ¬¸üĞÂºÍPID
+//è¿›è¡Œå§¿æ€æ›´æ–°å’ŒPID
 
 
 
 void PID_PWM(unsigned int *PWM1, unsigned int *PWM2, unsigned int *PWM3, unsigned int *PWM4);
-//·µ»ØPIDºóËÄ¸öPWMµÄÖµ
+//è¿”å›PIDåå››ä¸ªPWMçš„å€¼
