@@ -55,7 +55,7 @@ void updata(float dt){
 	z = cup3 / norm;
 }
 
-//互补滤波（真的吗）
+//互补滤波（真叫这个名字吗）
 void COM_FILT(mpu9255_data accel, mpu9255_data gyro)
 {
 	float e_x, e_y, e_z;
@@ -99,6 +99,7 @@ typedef struct{
 	float errint;
 }PIDparameter;
 
+//PID参数
 PIDparameter pid_data[] = {
 //   kp  ki  kd
 	{0.8, 0, 0, 0, 0, 0, 0}, //内环pitch
@@ -109,6 +110,7 @@ PIDparameter pid_data[] = {
 	{1,   0, 0, 0, 0, 0, 0}  //外环机体坐标z方向角速度
 };
 
+//PID算法
 float PID(float set, float actual, PIDparameter haha) {
     haha.err2 = haha.err1;
 	haha.err1 = haha.err;
@@ -119,9 +121,8 @@ float PID(float set, float actual, PIDparameter haha) {
 	return haha.kp*haha.err + haha.ki*haha.errint + haha.kd*(3 * haha.err - 4 * haha.err1 + haha.err2);
 }
 
-
+//三个方向都算一遍内外环PID  (ง •_•)ง
 float pid_out[3]={0,0,0};
-
 void pid_motor(float *set, float *actual, PIDparameter pid_value[]){
     unsigned char i=0;
     float w_test[3] = {0,0,0};
@@ -132,7 +133,7 @@ void pid_motor(float *set, float *actual, PIDparameter pid_value[]){
     }
 }
 
-//电机----------------------------------------------------------------------------
+//PID的输出与PWM对应关系----------------------------------------------------------------------------
 Motor[4] = {0,0,0,0};
 float *motor(float thu){
 //PID的输出           yaw           pitch        roll    
@@ -144,7 +145,7 @@ float *motor(float thu){
 //---------------------------------------------------------------------------------
 
 
-
+//唯二的对外可见函数
 float *AHRS(mpu9255_data accel, mpu9255_data gyro, float nrf[], PIDparameter pid_QAQ, float dt){
     float th[3];
     float th_set[3];
