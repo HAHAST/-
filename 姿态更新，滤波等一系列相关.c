@@ -1,8 +1,8 @@
 #include <math.h>
 #include "AHRS_PID.h"
 
+//姿态解算部分-------------------------------------------------------------------------------------------
 //四轴姿态参数
-
 typedef struct mpu9255_data_struct{
     float x;
     float y;
@@ -15,8 +15,9 @@ float pitch = 0, yaw = 0, roll = 0;
 float w_x0 = 0, w_y0 = 0, w_z0 = 0; 
 float w[3] = {0, 0, 0};         
 
-void EtoQ()  //欧拉角转四元数
-{
+
+//欧拉角转四元数
+void EtoQ(){
 	float norm;
 
 	s = cos(roll / 2)*cos(pitch / 2)*cos(yaw / 2) - sin(yaw / 2)*sin(roll / 2)*sin(pitch / 2);
@@ -59,12 +60,13 @@ void COM_FILT(mpu9255_data accel, mpu9255_data gyro)
 {
 	float e_x, e_y, e_z;
 	float g_x, g_y, g_z;
+    float a_x, a_y, a_z;
 	float norm;
 
-	norm = sqrt(a_y*a_y + a_x*a_x + a_z*a_z);
-	a_x = a_x / norm;
-	a_y = a_y / norm;
-	a_z = a_z / norm; 
+	norm = sqrt(accel.x*accel.x + accel.y*accel.y + accel.z*accel.z);
+	a_x = accel.x / norm;
+	a_y = accel.y / norm;
+	a_z = accel.z / norm; 
 
 	g_x = 2 * (x*z - s*y);
 	g_y = 2 * (y*z + s*x);
@@ -78,9 +80,9 @@ void COM_FILT(mpu9255_data accel, mpu9255_data gyro)
 	eInt_y = eInt_y + e_y*Ki;
 	eInt_z = eInt_z + e_z*Ki;
 
-	w[0] = w_x + Kp*e_x + eInt_x;
-	w[1] = w_y + Kp*e_y + eInt_y;
-	w[2] = w_z + Kp*e_z + eInt_z;
+	w[0] = gyro.x + Kp*e_x + eInt_x;
+	w[1] = gyro.y + Kp*e_y + eInt_y;
+	w[2] = gyro.z + Kp*e_z + eInt_z;
 }
 /*
 //卡尔曼滤波 _(:з」∠)_
@@ -102,9 +104,9 @@ PIDparameter pid_data[] = {
 	{0.8, 0, 0, 0, 0, 0, 0}, //内环pitch
 	{0.8, 0, 0, 0, 0, 0, 0}, //内环roll
 	{0.8, 0, 0, 0, 0, 0, 0}, //内环yaw
-	{0.8, 0, 0, 0, 0, 0, 0}, //外环机体坐标x方向角速度
-	{0.8, 0, 0, 0, 0, 0, 0}, //外环机体坐标y方向角速度
-	{0.8, 0, 0, 0, 0, 0, 0}  //外环机体坐标z方向角速度
+	{1,   0, 0, 0, 0, 0, 0}, //外环机体坐标x方向角速度
+	{1,   0, 0, 0, 0, 0, 0}, //外环机体坐标y方向角速度
+	{1,   0, 0, 0, 0, 0, 0}  //外环机体坐标z方向角速度
 };
 
 float PID(float set, float actual, PIDparameter haha) {
@@ -122,16 +124,33 @@ float pid_out[3]={0,0,0};
 
 void pid_motor(float *set, float *actual, PIDparameter pid_value[]){
     unsigned char i=0;
+    float w_test[3] = {0,0,0};
+    
     for (i=0; i<3; i++){
         pid_out[i] = PID(PID(set[i], actual[i], pid_value[i]),
-                         w[i], pid_value[i+3]);
+                         w_test[i], pid_value[i+3]);
     }
-    return pid_out;
 }
 
+//电机----------------------------------------------------------------------------
+Motor[4] = {0,0,0,0};
+float *motor(float thu){
+//PID的输出           yaw           pitch        roll    
+    Motor[1] = thu + pid_out[2] + pid_out[0] + pid_out[1];
+	Motor[2] = thu - pid_out[2] + pid_out[0] - pid_out[1];
+	Motor[3] = thu + pid_out[2] - pid_out[0] - pid_out[1];
+	Motor[4] = thu - pid_out[2] - pid_out[0] + pid_out[1];
+}
 
-float *AHRS(mpu9255_data accel, mpu9255_data gyro, PIDparameter pid_QAQ, float th_set[], float dt){
+float *AHRS(mpu9255_data accel, mpu9255_data gyro, float nrf[], PIDparameter pid_QAQ, float dt){
     float th[3];
+    float th_set[3];
+    float prowe = nrf[0];
+    
+    th_set[0] = nrf[1];
+    th_set[1] = nrf[2];
+    th_set[2] = 0;
+    
     COM_FILT(accel, gyro);
     updata(dt);
     QtoE();
@@ -139,8 +158,9 @@ float *AHRS(mpu9255_data accel, mpu9255_data gyro, PIDparameter pid_QAQ, float t
     th[0] = pitch;
     th[1] = roll;
     th[0] = yaw;
+    pid_motor(th_set, th, pid_QAQ);
     
-    return pid_out(th_set, th, pid_QAQ);
+    return motor(prowe);
 }
 
 
