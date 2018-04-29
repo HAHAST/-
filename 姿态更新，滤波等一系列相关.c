@@ -13,7 +13,8 @@ typedef struct mpu9255_data_struct{
 float s = 1, x = 0, y = 0, z = 0;  //四元数 
 float pitch = 0, yaw = 0, roll = 0; 
 float w_x0 = 0, w_y0 = 0, w_z0 = 0; 
-float w[3] = {0, 0, 0};         
+float w[3] = {0, 0, 0};
+float dt = 10;
 
 
 //欧拉角转四元数
@@ -80,9 +81,9 @@ void COM_FILT(mpu9255_data accel, mpu9255_data gyro)
 	eInt_y = eInt_y + e_y*Ki;
 	eInt_z = eInt_z + e_z*Ki;
 
-	w[0] = gyro.x + Kp*e_x + eInt_x;
-	w[1] = gyro.y + Kp*e_y + eInt_y;
-	w[2] = gyro.z + Kp*e_z + eInt_z;
+	w[0] = gyro.x -w_x0 + Kp*e_x + eInt_x;
+	w[1] = gyro.y -w_y0 + Kp*e_y + eInt_y;
+	w[2] = gyro.z -w_z0 + Kp*e_z + eInt_z;
 }
 /*
 //卡尔曼滤波 _(:з」∠)_
@@ -168,7 +169,15 @@ float *AHRS(float *pwm, mpu9255_data accel, mpu9255_data gyro, float nrf[], PIDp
     return motor(pwm, pid, prowe);
 }
 
-
-
-
+void init_AHRS(mpu9255_data accel, mpu9255_data gyro, float time){
+    pitch = atan2(accel.y, accel.z);
+    roll = atan2(accel.x, accel.z);
+    E_Q();
+	
+	w_x0 = gyro.x;
+    w_y0 = gyro.y;
+    w_z0 = gyro.z;
+    
+    dt = time;
+}
 
