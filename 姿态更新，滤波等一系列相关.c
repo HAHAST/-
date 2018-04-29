@@ -42,7 +42,7 @@ void QtoE(){
 
 
 //姿态更新
-void updata(float dt){
+void updata(void){
     float cup0, cup1, cup2, cup3, norm;
 	
     cup0 = s - 0.5*(w[0]*x + w[1]*y + w[2]*z)*dt;
@@ -147,7 +147,7 @@ float *motor(float *Motor, float *pid_out, float thu){
 
 
 //唯二的对外可见函数
-float *AHRS(float *pwm, mpu9255_data accel, mpu9255_data gyro, float nrf[], PIDparameter pid_QAQ, float dt){
+float *AHRS(float *pwm, mpu9255_data accel, mpu9255_data gyro, float nrf[], PIDparameter pid_QAQ){
     float th[3];
     float th_set[3];
     float pid[3];
@@ -158,7 +158,7 @@ float *AHRS(float *pwm, mpu9255_data accel, mpu9255_data gyro, float nrf[], PIDp
     th_set[2] = 0;
     
     COM_FILT(accel, gyro);
-    updata(dt);
+    updata();
     QtoE();
     
     th[0] = pitch;
@@ -169,11 +169,12 @@ float *AHRS(float *pwm, mpu9255_data accel, mpu9255_data gyro, float nrf[], PIDp
     return motor(pwm, pid, prowe);
 }
 
+
+//唯二对外可见函数
 void init_AHRS(mpu9255_data accel, mpu9255_data gyro, float time){
     pitch = atan2(accel.y, accel.z);
     roll = atan2(accel.x, accel.z);
     E_Q();
-	
 	w_x0 = gyro.x;
     w_y0 = gyro.y;
     w_z0 = gyro.z;
