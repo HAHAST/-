@@ -91,15 +91,9 @@ void KF(){
 }
 */
 
+
+
 //PID部分--------------------------------------------------
-
-typedef struct{
-    float kp, ki, kd;
-    float err, err1, err2;
-    float errint;
-}PIDparameter;
-
-
 
 //PID算法
 float PID(float set, float actual, PIDparameter *haha){
