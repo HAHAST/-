@@ -34,13 +34,13 @@ PIDparameter pid_data[] = {
 
 
 //获取初始四元数和陀螺仪静差,第一个参数传加速度，第二个参数传陀螺仪，第三个参数传定时器定时周期
-void init_AHRS(Mpu9255_data accel, Mpu9255_data gyro, float time);
+void init_AHRS(Mpu9255_data *accel, Mpu9255_data *gyro, float time);
 
 
 //姿态更新PID电机PWM， 第一个参数为输出4个元素的数组，分别为4个PWM的值
 //第二个参数是加速度，第三个是陀螺仪，第四个是NRF的数组，第五个是PID的参数
 //返回值和第一个参数一样，返回第一个参数的地址
-float *AHRS(float *pwm, Mpu9255_data accel, Mpu9255_data gyro, float nrf[], PIDparameter pid_QAQ);
+float *AHRS(float *pwm, Mpu9255_data *accel, Mpu9255_data *gyro, float nrf[], PIDparameter *pid_QAQ);
 
 //              AHRS输出数组pwm[] 4个元素对应电机图
 //
