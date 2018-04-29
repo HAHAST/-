@@ -51,17 +51,17 @@ void updata(void){
 }
 
 //互补滤波（真叫这个名字吗）
-void COM_FILT(Mpu9255_data accel, Mpu9255_data gyro)
+void COM_FILT(Mpu9255_data *accel, Mpu9255_data *gyro)
 {
 	float e_x, e_y, e_z;
 	float g_x, g_y, g_z;
     float a_x, a_y, a_z;
 	float norm;
 
-	norm = sqrt(accel.x*accel.x + accel.y*accel.y + accel.z*accel.z);
-	a_x = accel.x / norm;
-	a_y = accel.y / norm;
-	a_z = accel.z / norm; 
+	norm = sqrt(accel->x*accel->x + accel->y*accel->y + accel->z*accel->z);
+	a_x = accel->x / norm;
+	a_y = accel->y / norm;
+	a_z = accel->z / norm; 
 
 	g_x = 2 * (x*z - s*y);
 	g_y = 2 * (y*z + s*x);
@@ -75,9 +75,9 @@ void COM_FILT(Mpu9255_data accel, Mpu9255_data gyro)
 	eInt_y = eInt_y + e_y*Ki;
 	eInt_z = eInt_z + e_z*Ki;
 
-	w[0] = gyro.x -w_x0 + Kp*e_x + eInt_x;
-	w[1] = gyro.y -w_y0 + Kp*e_y + eInt_y;
-	w[2] = gyro.z -w_z0 + Kp*e_z + eInt_z;
+	w[0] = gyro->x -w_x0 + Kp*e_x + eInt_x;
+	w[1] = gyro->y -w_y0 + Kp*e_y + eInt_y;
+	w[2] = gyro->z -w_z0 + Kp*e_z + eInt_z;
 }
 /*
 //卡尔曼滤波 _(:з」∠)_
@@ -97,18 +97,18 @@ typedef struct{
 
 
 //PID算法
-float PID(float set, float actual, PIDparameter haha) {
-    haha.err2 = haha.err1;
-	haha.err1 = haha.err;
+float PID(float set, float actual, PIDparameter *haha) {
+    haha->err2 = haha->err1;
+	haha->err1 = haha->err;
     
-	haha.err = set - actual;
-	haha.errint += haha.err;
+	haha->err = set - actual;
+	haha->errint += haha->err;
 	
-	return haha.kp*haha.err + haha.ki*haha.errint + haha.kd*(3 * haha.err - 4 * haha.err1 + haha.err2);
+	return haha->kp*haha->err + haha->ki*haha->errint + haha->kd*(3 * haha->err - 4 * haha->err1 + haha->err2);
 }
 
 //三个方向都算一遍内外环PID  (ง •_•)ง
-void pid_motor(float *pid_out, float *set, float *actual, PIDparameter pid_value[]){
+void pid_motor(float *pid_out, float *set, float *actual, PIDparameter *(pid_value[])){
     unsigned char i=0;
     float w_test[3] = {0,0,0};
     
@@ -132,7 +132,7 @@ float *motor(float *Motor, float *pid_out, float thu){
 
 
 //唯二的对外可见函数
-float *AHRS(float *pwm, Mpu9255_data accel, Mpu9255_data gyro, float nrf[], PIDparameter pid_QAQ){
+float *AHRS(float *pwm, Mpu9255_data *accel, Mpu9255_data *gyro, float nrf[], PIDparameter *pid_QAQ){
     float th[3];
     float th_set[3];
     float pid[3];
@@ -156,13 +156,13 @@ float *AHRS(float *pwm, Mpu9255_data accel, Mpu9255_data gyro, float nrf[], PIDp
 
 
 //唯二对外可见函数
-void init_AHRS(Mpu9255_data accel, Mpu9255_data gyro, float time){
-    pitch = atan2(accel.y, accel.z);
-    roll = atan2(accel.x, accel.z);
+void init_AHRS(Mpu9255_data *accel, Mpu9255_data *gyro, float time){
+    pitch = atan2(accel->y, accel->z);
+    roll = atan2(accel->x, accel->z);
     E_Q();
-	w_x0 = gyro.x;
-    w_y0 = gyro.y;
-    w_z0 = gyro.z;
+	w_x0 = gyro->x;
+    w_y0 = gyro->y;
+    w_z0 = gyro->z;
     
     dt = time;
 }
