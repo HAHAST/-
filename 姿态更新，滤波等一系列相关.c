@@ -100,16 +100,7 @@ typedef struct{
 	float errint;
 }PIDparameter;
 
-//PID参数
-PIDparameter pid_data[] = {
-//   kp  ki  kd
-	{0.8, 0, 0, 0, 0, 0, 0}, //内环pitch
-	{0.8, 0, 0, 0, 0, 0, 0}, //内环roll
-	{0.8, 0, 0, 0, 0, 0, 0}, //内环yaw
-	{1,   0, 0, 0, 0, 0, 0}, //外环机体坐标x方向角速度
-	{1,   0, 0, 0, 0, 0, 0}, //外环机体坐标y方向角速度
-	{1,   0, 0, 0, 0, 0, 0}  //外环机体坐标z方向角速度
-};
+
 
 //PID算法
 float PID(float set, float actual, PIDparameter haha) {
