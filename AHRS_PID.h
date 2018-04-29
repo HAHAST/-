@@ -24,7 +24,25 @@ void init_AHRS(mpu9255_data accel, mpu9255_data gyro, float time);
 //返回值和第一个参数一样，返回第一个参数的地址
 float *AHRS(float *pwm, mpu9255_data accel, mpu9255_data gyro, float nrf[], PIDparameter pid_QAQ);
 
+//              AHRS输出数组pwm[] 4个元素对应电机图
+//
+//
+//              pwm[0]                               pwm[1]
+//                                 y轴
+//                                  |
+//                                  |
+//                               MPU9255—————— x轴  
+//                                  
+//
+//
+//
+//              pwm[4]                               pwm[3]
+//
+//
 
 
 
 #endif
+
+
+
