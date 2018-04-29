@@ -44,29 +44,29 @@
 /*------------------------------------------------------------------------------
 																																								
 																																								
-¿Õ¼äÃû³Æ							µØÖ··¶Î§							ËµÃ÷																
+ç©ºé—´åç§°							åœ°å€èŒƒå›´							è¯´æ˜																
 																																								
 																																								
-DATA									D:00H~7FH							Æ¬ÄÚRAMÖ±½ÓÑ°Ö·Çø										
+DATA									D:00H~7FH							ç‰‡å†…RAMç›´æ¥å¯»å€åŒº										
 																																								
-BDATA									D"20H~2FH							Æ¬ÄÚRAMÎ»Ñ°Ö·Çø
+BDATA									D"20H~2FH							ç‰‡å†…RAMä½å¯»å€åŒº
 
-IDATA									I:00H~FFH							Æ¬ÄÚRAM¼ä½ÓÑ°Ö·Çø
+IDATA									I:00H~FFH							ç‰‡å†…RAMé—´æ¥å¯»å€åŒº
 
-XDATA									X:0000H~FFFFH					64KB³£¹æÆ¬ÍâRAMÊı¾İÇø
+XDATA									X:0000H~FFFFH					64KBå¸¸è§„ç‰‡å¤–RAMæ•°æ®åŒº
 
-HDATA									X:0000H~FFFFFFH				16MBÍØÕ¹Æ¬ÍâRAMÊı¾İÇø
+HDATA									X:0000H~FFFFFFH				16MBæ‹“å±•ç‰‡å¤–RAMæ•°æ®åŒº
 
-CODE									C:0000H~FFFFH					64K³£¹æÆ¬ÄÚÍâROM´úÂëÇø
+CODE									C:0000H~FFFFH					64Kå¸¸è§„ç‰‡å†…å¤–ROMä»£ç åŒº
 
-HCONST(ECODE)					C:0000H~FFFFFFH				16MBÍØÕ¹Æ¬ÍâROM³£ÊıÇø
+HCONST(ECODE)					C:0000H~FFFFFFH				16MBæ‹“å±•ç‰‡å¤–ROMå¸¸æ•°åŒº
 
-BANK0~BANK31					B0:0000H~FFFFH				·Ö×é´úÂëÇø£¬×î´ó¿ÉÍØÕ¹32X64KB ROM
+BANK0~BANK31					B0:0000H~FFFFH				åˆ†ç»„ä»£ç åŒºï¼Œæœ€å¤§å¯æ‹“å±•32X64KB ROM
 											:	
 											:
 											B31:0000H~FFFFH
 -------------------------------------------------------------------------------*/
-/*************°üº¬ÎÄ¼ş************/
+/*************åŒ…å«æ–‡ä»¶************/
 #include  "STC15F2K60S2.H"         
 #include  "INTRINS.H"
 #include  "USEFUL.H"
@@ -86,14 +86,14 @@ BANK0~BANK31					B0:0000H~FFFFH				·Ö×é´úÂëÇø£¬×î´ó¿ÉÍØÕ¹32X64KB ROM
 /********************************************************************/
 bit FLAG = 0;
 unsigned char Rx_Buf[RX_PLOAD_WIDTH];
-unsigned char Rx_9 = 0;  //ÓÃÓÚ¼ì²âÊı¾İ±ä»¯
-unsigned char RX_DATA_CONV;  //ÓÍÃÅÊı¾İµÈ¼¶
-unsigned char STAS_DIG = 0;  //µÈÓÚ100Ê±Ò»ÃëÃ»ÊÕµ½ÎŞÏßĞÅºÅ
+unsigned char Rx_9 = 0;  //ç”¨äºæ£€æµ‹æ•°æ®å˜åŒ–
+unsigned char RX_DATA_CONV;  //æ²¹é—¨æ•°æ®ç­‰çº§
+unsigned char STAS_DIG = 0;  //ç­‰äº100æ—¶ä¸€ç§’æ²¡æ”¶åˆ°æ— çº¿ä¿¡å·
 
-float s = 1, x = 0, y = 0, z = 0;  //ËÄÔªÊı 
+float s = 1, x = 0, y = 0, z = 0;  //å››å…ƒæ•° 
 float pitch = 0, yaw = 0, roll = 0; 
 float w_x0 = 0, w_y0 = 0, w_z0 = 0;                     
-float eInt_x = 0, eInt_y = 0, eInt_z = 0;  //»¥²¹ÂË²¨Îó²î»ı·Ö
+float eInt_x = 0, eInt_y = 0, eInt_z = 0;  //äº’è¡¥æ»¤æ³¢è¯¯å·®ç§¯åˆ†
 
 typedef struct
 {
@@ -116,7 +116,7 @@ float PIDoutr0 = 0, PIDoutr1 = 0, PIDoutr2 = 0;
 float w_x, w_y, w_z;
 
 float xdata Motor1, Motor2, Motor3, Motor4;
-float xdata thu;  //ÓÍÃÅ
+float xdata thu;  //æ²¹é—¨
 //
 float PID(float set, float actual, unsigned char i) {
 	float u;
@@ -131,14 +131,14 @@ float PID(float set, float actual, unsigned char i) {
 	return u;
 }
 /********************************************************************/
-void Q_E() //ËÄÔªÊı×ªÅ·À­½Ç
+void Q_E() //å››å…ƒæ•°è½¬æ¬§æ‹‰è§’
 {
 	pitch = asin(2 * (z*y + s*x));
 	yaw = atan2(2 * (z*s - y*x), (1 - 2 * x*x - 2 * z*z));
 	roll = atan2(2 * (s*y - x*z), (1 - 2 * y*y - 2 * x*x));
 }
 //
-void E_Q()  //Å·À­½Ç×ªËÄÔªÊı
+void E_Q()  //æ¬§æ‹‰è§’è½¬å››å…ƒæ•°
 {
 	float norm;
 
@@ -153,7 +153,7 @@ void E_Q()  //Å·À­½Ç×ªËÄÔªÊı
 	y = y / norm;
 	z = z / norm;   
 }
-void POS_UPDATE(float w[3])  //×ËÌ¬¸üĞÂ
+void POS_UPDATE(float w[3])  //å§¿æ€æ›´æ–°
 {
 	float cup0, cup1, cup2, cup3, norm;
 	cup0 = s - 0.5*(w[0]*x + w[1]*y + w[2]*z)*T;
@@ -167,7 +167,7 @@ void POS_UPDATE(float w[3])  //×ËÌ¬¸üĞÂ
 	z = cup3 / norm;
 }
 //
-void COM_FILT(float a_x, float a_y, float a_z, float w_x, float w_y, float w_z, float w[3])  //»¥²¹ÂË²¨
+void COM_FILT(float a_x, float a_y, float a_z, float w_x, float w_y, float w_z, float w[3])  //äº’è¡¥æ»¤æ³¢
 {
 	float e_x, e_y, e_z;
 	float g_x, g_y, g_z;
@@ -195,7 +195,7 @@ void COM_FILT(float a_x, float a_y, float a_z, float w_x, float w_y, float w_z, 
 	w[2] = w_z + Kp*e_z + eInt_z;
 }
 //
-void GET_INIT_Q()  //»ñÈ¡³õÊ¼ËÄÔªÊı
+void GET_INIT_Q()  //è·å–åˆå§‹å››å…ƒæ•°
 {
 	unsigned char i;
 	float g_x = 0, g_y = 0, g_z = 0;
@@ -214,7 +214,7 @@ void GET_INIT_Q()  //»ñÈ¡³õÊ¼ËÄÔªÊı
 	roll = atan2(g_x, g_z);
 	E_Q();
 }
-void MOTOR_CTRL(float PID_yaw, float PID_pitch, float PID_roll)  //PID¿ØÖÆÖµ¼ÓÔØÖÁµç»ú
+void MOTOR_CTRL(float PID_yaw, float PID_pitch, float PID_roll)  //PIDæ§åˆ¶å€¼åŠ è½½è‡³ç”µæœº
 {
 	Motor1 = thu + PID_yaw + PID_pitch + PID_roll;
 	Motor2 = thu - PID_yaw + PID_pitch - PID_roll;
@@ -255,7 +255,7 @@ void AHRS(float a_x, float a_y, float a_z, float w_x, float w_y, float w_z)
 	
 	Q_E();
 }
-/*******************************MAINº¯Êı*****************************/
+/*******************************MAINå‡½æ•°*****************************/
 
 //                      d*##$.
 // zP"""""$e.           $"    $o
@@ -294,7 +294,7 @@ void AHRS(float a_x, float a_y, float a_z, float w_x, float w_y, float w_z)
 void main()
 {
 	float a = 0, b = 0, c = 0;
-	unsigned char THU_LVL,FB_LVL,LR_LVL;  //ÓÍÃÅÇ°ºó×óÓÒ·Ö¼¶
+	unsigned char THU_LVL,FB_LVL,LR_LVL;  //æ²¹é—¨å‰åå·¦å³åˆ†çº§
 	
 	IO_RESET();
 
@@ -322,13 +322,13 @@ void main()
 		
 		AHRS(GetData(ACCEL_XOUT_H)/8192.0, GetData(ACCEL_YOUT_H)/8192.0, GetData(ACCEL_ZOUT_H)/8192.0, w_x, w_y, w_z);
 		
-		nRF24L01_RxPacket(Rx_Buf);		//½ÓÊÕÎŞÏßÊı¾İ
+		nRF24L01_RxPacket(Rx_Buf);		//æ¥æ”¶æ— çº¿æ•°æ®
 		
-		THU_LVL = Rx_Buf[0] / 25;  //ÓÍÃÅ·Ö¼¶
-		FB_LVL = 10 - (Rx_Buf[1] / 25);  //Ç°ºó·Ö¼¶
-		LR_LVL = Rx_Buf[2] / 25;  //×óÓÒ·Ö¼¶
+		THU_LVL = Rx_Buf[0] / 25;  //æ²¹é—¨åˆ†çº§
+		FB_LVL = 10 - (Rx_Buf[1] / 25);  //å‰ååˆ†çº§
+		LR_LVL = Rx_Buf[2] / 25;  //å·¦å³åˆ†çº§
 		
-		P0 = Rx_Buf[0];  //Í¬ÉÏ
+		P0 = Rx_Buf[0];  //åŒä¸Š
 		thu = Rx_Buf[0];
 		a = ((255 - Rx_Buf[1]) - 127) * 0.0784313725;
 		b = (Rx_Buf[2] - 127) * 0.0784313725;
