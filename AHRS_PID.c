@@ -101,11 +101,11 @@ typedef struct{
 
 
 //PID算法
-float PID(float set, float actual, PIDparameter *haha) {
+float PID(float set, float actual, PIDparameter *haha){
     haha->err2 = haha->err1;
-	haha->err1 = haha->err;
+    haha->err1 = haha->err;
     
-	haha->err = set - actual;
+    haha->err = set - actual;
 	haha->errint += haha->err;
 	
 	return haha->kp*haha->err + haha->ki*haha->errint + haha->kd*(3 * haha->err - 4 * haha->err1 + haha->err2);
