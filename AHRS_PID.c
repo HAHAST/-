@@ -13,25 +13,25 @@ float dt = 10;
 
 //欧拉角转四元数
 void EtoQ(){
-	float norm;
+    float norm;
 
-	s = cos(roll / 2)*cos(pitch / 2)*cos(yaw / 2) - sin(yaw / 2)*sin(roll / 2)*sin(pitch / 2);
-	x = cos(roll / 2)*sin(pitch / 2)*cos(yaw / 2) - sin(roll / 2)*cos(pitch / 2)*sin(yaw / 2);
-	y = cos(roll / 2)*sin(pitch / 2)*sin(yaw / 2) + sin(roll / 2)*cos(pitch / 2)*cos(yaw / 2);
-	z = cos(roll / 2)*cos(pitch / 2)*sin(yaw / 2) + sin(roll / 2)*sin(pitch / 2)*cos(yaw / 2);
+    s = cos(roll / 2)*cos(pitch / 2)*cos(yaw / 2) - sin(yaw / 2)*sin(roll / 2)*sin(pitch / 2);
+    x = cos(roll / 2)*sin(pitch / 2)*cos(yaw / 2) - sin(roll / 2)*cos(pitch / 2)*sin(yaw / 2);
+    y = cos(roll / 2)*sin(pitch / 2)*sin(yaw / 2) + sin(roll / 2)*cos(pitch / 2)*cos(yaw / 2);
+    z = cos(roll / 2)*cos(pitch / 2)*sin(yaw / 2) + sin(roll / 2)*sin(pitch / 2)*cos(yaw / 2);
 
-	norm = sqrt(s*s + x * x + y * y + z * z);
-	s = s / norm;
-	x = x / norm;
-	y = y / norm;
-	z = z / norm;
+    norm = sqrt(s*s + x * x + y * y + z * z);
+    s = s / norm;
+    x = x / norm;
+    y = y / norm;
+    z = z / norm;
 }
 
 //四元数转欧拉角
 void QtoE(){
-	pitch = asin(2 * (z*y + s * x));
-	yaw = atan2(2 * (z*s - y * x), (1 - 2 * x*x - 2 * z*z));
-	roll = atan2(2 * (s*y - x * z), (1 - 2 * y*y - 2 * x*x));
+    pitch = asin(2 * (z*y + s * x));
+    yaw = atan2(2 * (z*s - y * x), (1 - 2 * x*x - 2 * z*z));
+    roll = atan2(2 * (s*y - x * z), (1 - 2 * y*y - 2 * x*x));
 }
 
 
@@ -41,13 +41,14 @@ void updata(void){
 	
     cup0 = s - 0.5*(w[0]*x + w[1]*y + w[2]*z)*dt;
     cup1 = x + 0.5*(w[0]*s + w[2]*y - w[1]*z)*dt;
-	cup2 = y + 0.5*(w[1]*s - w[2]*x + w[0]*z)*dt;
-	cup3 = z + 0.5*(w[2]*s + w[1]*x - w[0]*y)*dt;
-	norm = sqrt(cup0*cup0 + cup1*cup1 + cup2*cup2 + cup3*cup3);
-	s = cup0 / norm;
-	x = cup1 / norm;
-	y = cup2 / norm;
-	z = cup3 / norm;
+    cup2 = y + 0.5*(w[1]*s - w[2]*x + w[0]*z)*dt;
+    cup3 = z + 0.5*(w[2]*s + w[1]*x - w[0]*y)*dt;
+    norm = sqrt(cup0*cup0 + cup1*cup1 + cup2*cup2 + cup3*cup3);
+    
+    s = cup0 / norm;
+    x = cup1 / norm;
+    y = cup2 / norm;
+    z = cup3 / norm;
 }
 
 
@@ -57,31 +58,31 @@ void updata(void){
 float eInt_x = 0, eInt_y = 0, eInt_z = 0; 
 void COM_FILT(Mpu9255_Data *accel, Mpu9255_Data *gyro)
 {
-	float e_x, e_y, e_z;
-	float g_x, g_y, g_z;
+    float e_x, e_y, e_z;
+    float g_x, g_y, g_z;
     float a_x, a_y, a_z;
-	float norm;
+    float norm;
 
-	norm = sqrt(accel->x*accel->x + accel->y*accel->y + accel->z*accel->z);
-	a_x = accel->x / norm;
-	a_y = accel->y / norm;
-	a_z = accel->z / norm; 
+    norm = sqrt(accel->x*accel->x + accel->y*accel->y + accel->z*accel->z);
+    a_x = accel->x / norm;
+    a_y = accel->y / norm;
+    a_z = accel->z / norm; 
 
-	g_x = 2 * (x*z - s*y);
-	g_y = 2 * (y*z + s*x);
-	g_z = 1 - 2 * (x*x + y*y);   
+    g_x = 2 * (x*z - s*y);
+    g_y = 2 * (y*z + s*x);
+    g_z = 1 - 2 * (x*x + y*y);   
 
-	e_x = a_y*g_z - a_z*g_y;
-	e_y = a_z*g_x - a_x*g_z;
-	e_z = a_x*g_y - a_y*g_x;
+    e_x = a_y*g_z - a_z*g_y;
+    e_y = a_z*g_x - a_x*g_z;
+    e_z = a_x*g_y - a_y*g_x;
 
-	eInt_x = eInt_x + e_x*Ki;
-	eInt_y = eInt_y + e_y*Ki;
-	eInt_z = eInt_z + e_z*Ki;
+    eInt_x = eInt_x + e_x*Ki;
+    eInt_y = eInt_y + e_y*Ki;
+    eInt_z = eInt_z + e_z*Ki;
 
-	w[0] = gyro->x -w_x0 + Kp*e_x + eInt_x;
-	w[1] = gyro->y -w_y0 + Kp*e_y + eInt_y;
-	w[2] = gyro->z -w_z0 + Kp*e_z + eInt_z;
+    w[0] = gyro->x -w_x0 + Kp*e_x + eInt_x;
+    w[1] = gyro->y -w_y0 + Kp*e_y + eInt_y;
+    w[2] = gyro->z -w_z0 + Kp*e_z + eInt_z;
 }
 /*
 //卡尔曼滤波 _(:з」∠)_
@@ -93,9 +94,9 @@ void KF(){
 //PID部分--------------------------------------------------
 
 typedef struct{
-	float kp, ki, kd;
-	float err, err1, err2;
-	float errint;
+    float kp, ki, kd;
+    float err, err1, err2;
+    float errint;
 }PIDparameter;
 
 
@@ -106,9 +107,9 @@ float PID(float set, float actual, PIDparameter *haha){
     haha->err1 = haha->err;
     
     haha->err = set - actual;
-	haha->errint += haha->err;
+    haha->errint += haha->err;
 	
-	return haha->kp*haha->err + haha->ki*haha->errint + haha->kd*(3 * haha->err - 4 * haha->err1 + haha->err2);
+    return haha->kp*haha->err + haha->ki*haha->errint + haha->kd*(3 * haha->err - 4 * haha->err1 + haha->err2);
 }
 
 //三个方向都算一遍内外环PID  (ง •_•)ง
@@ -127,8 +128,8 @@ float *motor(float *Motor, float *pid_out, float thu){
 //PID的输出           yaw           pitch        roll    
     Motor[1] = thu + pid_out[2] + pid_out[0] + pid_out[1];
     Motor[2] = thu - pid_out[2] + pid_out[0] - pid_out[1];
-	Motor[3] = thu + pid_out[2] - pid_out[0] - pid_out[1];
-	Motor[4] = thu - pid_out[2] - pid_out[0] + pid_out[1];
+    Motor[3] = thu + pid_out[2] - pid_out[0] - pid_out[1];
+    Motor[4] = thu - pid_out[2] - pid_out[0] + pid_out[1];
     
     return Motor;
 }
@@ -164,7 +165,7 @@ void init_AHRS(Mpu9255_Data *accel, Mpu9255_Data *gyro, float time){
     pitch = atan2(accel->y, accel->z);
     roll = atan2(accel->x, accel->z);
     E_Q();
-	w_x0 = gyro->x;
+    w_x0 = gyro->x;
     w_y0 = gyro->y;
     w_z0 = gyro->z;
     
