@@ -50,8 +50,12 @@ void updata(void){
 	z = cup3 / norm;
 }
 
+
 //互补滤波（真叫这个名字吗）
-void COM_FILT(Mpu9255_data *accel, Mpu9255_data *gyro)
+#define Ki   0.001f
+#define Kp   0.8f
+float eInt_x = 0, eInt_y = 0, eInt_z = 0; 
+void COM_FILT(Mpu9255_Data *accel, Mpu9255_Data *gyro)
 {
 	float e_x, e_y, e_z;
 	float g_x, g_y, g_z;
@@ -132,7 +136,7 @@ float *motor(float *Motor, float *pid_out, float thu){
 
 
 //唯二的对外可见函数
-float *AHRS(float *pwm, Mpu9255_data *accel, Mpu9255_data *gyro, float nrf[], PIDparameter *pid_QAQ){
+float *AHRS(float *pwm, Mpu9255_Data *accel, Mpu9255_Data *gyro, float nrf[], PIDparameter *pid_QAQ){
     float th[3];
     float th_set[3];
     float pid[3];
@@ -156,7 +160,7 @@ float *AHRS(float *pwm, Mpu9255_data *accel, Mpu9255_data *gyro, float nrf[], PI
 
 
 //唯二对外可见函数
-void init_AHRS(Mpu9255_data *accel, Mpu9255_data *gyro, float time){
+void init_AHRS(Mpu9255_Data *accel, Mpu9255_Data *gyro, float time){
     pitch = atan2(accel->y, accel->z);
     roll = atan2(accel->x, accel->z);
     E_Q();
