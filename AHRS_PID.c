@@ -2,12 +2,6 @@
 #include "AHRS_PID.h"
 
 //姿态解算部分-------------------------------------------------------------------------------------------
-//四轴姿态参数
-typedef struct mpu9255_data_struct{
-    float x;
-    float y;
-    float z;
-}mpu9255_data;
 
 
 float s = 1, x = 0, y = 0, z = 0;  //四元数 
@@ -57,7 +51,7 @@ void updata(void){
 }
 
 //互补滤波（真叫这个名字吗）
-void COM_FILT(mpu9255_data accel, mpu9255_data gyro)
+void COM_FILT(Mpu9255_data accel, Mpu9255_data gyro)
 {
 	float e_x, e_y, e_z;
 	float g_x, g_y, g_z;
@@ -138,7 +132,7 @@ float *motor(float *Motor, float *pid_out, float thu){
 
 
 //唯二的对外可见函数
-float *AHRS(float *pwm, mpu9255_data accel, mpu9255_data gyro, float nrf[], PIDparameter pid_QAQ){
+float *AHRS(float *pwm, Mpu9255_data accel, Mpu9255_data gyro, float nrf[], PIDparameter pid_QAQ){
     float th[3];
     float th_set[3];
     float pid[3];
@@ -162,7 +156,7 @@ float *AHRS(float *pwm, mpu9255_data accel, mpu9255_data gyro, float nrf[], PIDp
 
 
 //唯二对外可见函数
-void init_AHRS(mpu9255_data accel, mpu9255_data gyro, float time){
+void init_AHRS(Mpu9255_data accel, Mpu9255_data gyro, float time){
     pitch = atan2(accel.y, accel.z);
     roll = atan2(accel.x, accel.z);
     E_Q();
