@@ -122,8 +122,7 @@ float PID(float set, float actual, PIDparameter haha) {
 }
 
 //三个方向都算一遍内外环PID  (ง •_•)ง
-float pid_out[3]={0,0,0};
-void pid_motor(float *set, float *actual, PIDparameter pid_value[]){
+void pid_motor(float *pid_out, float *set, float *actual, PIDparameter pid_value[]){
     unsigned char i=0;
     float w_test[3] = {0,0,0};
     
@@ -134,21 +133,23 @@ void pid_motor(float *set, float *actual, PIDparameter pid_value[]){
 }
 
 //PID的输出与PWM对应关系----------------------------------------------------------------------------
-Motor[4] = {0,0,0,0};
-float *motor(float thu){
+float *motor(float *Motor, float *pid_out, float thu){
 //PID的输出           yaw           pitch        roll    
     Motor[1] = thu + pid_out[2] + pid_out[0] + pid_out[1];
-	Motor[2] = thu - pid_out[2] + pid_out[0] - pid_out[1];
+    Motor[2] = thu - pid_out[2] + pid_out[0] - pid_out[1];
 	Motor[3] = thu + pid_out[2] - pid_out[0] - pid_out[1];
 	Motor[4] = thu - pid_out[2] - pid_out[0] + pid_out[1];
+    
+    return Motor;
 }
 //---------------------------------------------------------------------------------
 
 
 //唯二的对外可见函数
-float *AHRS(mpu9255_data accel, mpu9255_data gyro, float nrf[], PIDparameter pid_QAQ, float dt){
+float *AHRS(float *pwm, mpu9255_data accel, mpu9255_data gyro, float nrf[], PIDparameter pid_QAQ, float dt){
     float th[3];
     float th_set[3];
+    float pid[3];
     float prowe = nrf[0];
     
     th_set[0] = nrf[1];
@@ -161,10 +162,10 @@ float *AHRS(mpu9255_data accel, mpu9255_data gyro, float nrf[], PIDparameter pid
     
     th[0] = pitch;
     th[1] = roll;
-    th[0] = yaw;
-    pid_motor(th_set, th, pid_QAQ);
+    th[2] = yaw;
+    pid_motor(pid, th_set, th, pid_QAQ);
     
-    return motor(prowe);
+    return motor(pwm, pid, prowe);
 }
 
 
