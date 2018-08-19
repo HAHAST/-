@@ -7,7 +7,7 @@
 float s = 1, x = 0, y = 0, z = 0;  //四元数 
 float pitch = 0, yaw = 0, roll = 0; 
 float w_x0 = 0, w_y0 = 0, w_z0 = 0; 
-float w[3] = {0, 0, 0};
+float w_xK = 0, w_yK = 0, w_zK = 0;
 float dt = 10;
 
 static float invSqrt(float number) {
@@ -49,15 +49,15 @@ void QtoE(){
 
 
 //姿态更新
-void updata(void){
-    float cup0, cup1, cup2, cup3, norm;
-	
-    cup0 = s - 0.5*(w[0]*x + w[1]*y + w[2]*z)*dt;
-    cup1 = x + 0.5*(w[0]*s + w[2]*y - w[1]*z)*dt;
-    cup2 = y + 0.5*(w[1]*s - w[2]*x + w[0]*z)*dt;
-    cup3 = z + 0.5*(w[2]*s + w[1]*x - w[0]*y)*dt;
+
+void updata_q(){
+    float cup0, cup1, cup2, cup3,norm;
+    cup0 = s-0.5*(w_xK*x + w_yK*y + w_zK*z)*dt;
+    cup1 = x+0.5*(w_xK*s + w_zK*y - w_yK*z)*dt;
+    cup2 = y+0.5*(w_yK*s - w_zK*x + w_xK*z)*dt;
+    cup3 = z+0.5*(w_zK*s + w_yK*x - w_xK*y)*dt;
     norm = invSqrt(cup0*cup0 + cup1*cup1 + cup2*cup2 + cup3*cup3);
-    
+
     s = cup0 * norm;
     x = cup1 * norm;
     y = cup2 * norm;
@@ -65,7 +65,7 @@ void updata(void){
 }
 
 
-//互补滤波（真叫这个名字吗）
+//Mahony互补滤波
 #define Ki   0.001f
 #define Kp   0.8f
 float eInt_x = 0, eInt_y = 0, eInt_z = 0; 
@@ -93,9 +93,9 @@ void COM_FILT(Mpu9255_Data *accel, Mpu9255_Data *gyro)
     eInt_y = eInt_y + e_y*Ki;
     eInt_z = eInt_z + e_z*Ki;
 
-    w[0] = gyro->x -w_x0 + Kp*e_x + eInt_x;
-    w[1] = gyro->y -w_y0 + Kp*e_y + eInt_y;
-    w[2] = gyro->z -w_z0 + Kp*e_z + eInt_z;
+    w_xK = gyro->x -w_x0 + Kp*e_x + eInt_x;
+    w_yK = gyro->y -w_y0 + Kp*e_y + eInt_y;
+    w_zK = gyro->z -w_z0 + Kp*e_z + eInt_z;
 }
 /*
 //卡尔曼滤波 _(:з」∠)_
