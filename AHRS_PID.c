@@ -10,6 +10,19 @@ float w_x0 = 0, w_y0 = 0, w_z0 = 0;
 float w[3] = {0, 0, 0};
 float dt = 10;
 
+static float invSqrt(float number) {
+    volatile long i;
+    volatile float x, y;
+    volatile const float f = 1.5F;
+
+    x = number * 0.5F;
+    y = number;
+    i = * (( long * ) &y);
+    i = 0x5f375a86 - ( i >> 1 );
+    y = * (( float * ) &i);
+    y = y * ( f - ( x * y * y ) );
+    return y;
+}
 
 //欧拉角转四元数
 void EtoQ(){
@@ -20,11 +33,11 @@ void EtoQ(){
     y = cos(roll / 2)*sin(pitch / 2)*sin(yaw / 2) + sin(roll / 2)*cos(pitch / 2)*cos(yaw / 2);
     z = cos(roll / 2)*cos(pitch / 2)*sin(yaw / 2) + sin(roll / 2)*sin(pitch / 2)*cos(yaw / 2);
 
-    norm = sqrt(s*s + x * x + y * y + z * z);
-    s = s / norm;
-    x = x / norm;
-    y = y / norm;
-    z = z / norm;
+    norm = invSqrt(s*s + x * x + y * y + z * z);
+    s = s * norm;
+    x = x * norm;
+    y = y * norm;
+    z = z * norm;
 }
 
 //四元数转欧拉角
@@ -43,12 +56,12 @@ void updata(void){
     cup1 = x + 0.5*(w[0]*s + w[2]*y - w[1]*z)*dt;
     cup2 = y + 0.5*(w[1]*s - w[2]*x + w[0]*z)*dt;
     cup3 = z + 0.5*(w[2]*s + w[1]*x - w[0]*y)*dt;
-    norm = sqrt(cup0*cup0 + cup1*cup1 + cup2*cup2 + cup3*cup3);
+    norm = invSqrt(cup0*cup0 + cup1*cup1 + cup2*cup2 + cup3*cup3);
     
-    s = cup0 / norm;
-    x = cup1 / norm;
-    y = cup2 / norm;
-    z = cup3 / norm;
+    s = cup0 * norm;
+    x = cup1 * norm;
+    y = cup2 * norm;
+    z = cup3 * norm;
 }
 
 
@@ -63,10 +76,10 @@ void COM_FILT(Mpu9255_Data *accel, Mpu9255_Data *gyro)
     float a_x, a_y, a_z;
     float norm;
 
-    norm = sqrt(accel->x*accel->x + accel->y*accel->y + accel->z*accel->z);
-    a_x = accel->x / norm;
-    a_y = accel->y / norm;
-    a_z = accel->z / norm; 
+    norm = invSqrt(accel->x*accel->x + accel->y*accel->y + accel->z*accel->z);
+    a_x = accel->x * norm;
+    a_y = accel->y * norm;
+    a_z = accel->z * norm; 
 
     g_x = 2 * (x*z - s*y);
     g_y = 2 * (y*z + s*x);
