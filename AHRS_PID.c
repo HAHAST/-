@@ -7,7 +7,7 @@
 float s = 1, x = 0, y = 0, z = 0;  //四元数 
 float pitch = 0, yaw = 0, roll = 0; 
 float w_x0 = 0, w_y0 = 0, w_z0 = 0; 
-float w_xK = 0, w_yK = 0, w_zK = 0;
+
 float dt = 10;
 
 static float invSqrt(float number) {
@@ -48,29 +48,16 @@ void QtoE(){
 }
 
 
-//姿态更新
-
-void updata_q(){
-    float cup0, cup1, cup2, cup3,norm;
-    cup0 = s-0.5*(w_xK*x + w_yK*y + w_zK*z)*dt;
-    cup1 = x+0.5*(w_xK*s + w_zK*y - w_yK*z)*dt;
-    cup2 = y+0.5*(w_yK*s - w_zK*x + w_xK*z)*dt;
-    cup3 = z+0.5*(w_zK*s + w_yK*x - w_xK*y)*dt;
-    norm = invSqrt(cup0*cup0 + cup1*cup1 + cup2*cup2 + cup3*cup3);
-
-    s = cup0 * norm;
-    x = cup1 * norm;
-    y = cup2 * norm;
-    z = cup3 * norm;
-}
 
 
 //Mahony互补滤波
 #define Ki   0.001f
 #define Kp   0.8f
 float eInt_x = 0, eInt_y = 0, eInt_z = 0; 
-void COM_FILT(Mpu9255_Data *accel, Mpu9255_Data *gyro)
+void Mahony(Mpu9255_Data *accel, Mpu9255_Data *gyro, float dt)
 {
+    float cup0, cup1, cup2, cup3,norm;
+    float w_xK = 0, w_yK = 0, w_zK = 0;
     float e_x, e_y, e_z;
     float g_x, g_y, g_z;
     float a_x, a_y, a_z;
@@ -96,6 +83,19 @@ void COM_FILT(Mpu9255_Data *accel, Mpu9255_Data *gyro)
     w_xK = gyro->x -w_x0 + Kp*e_x + eInt_x;
     w_yK = gyro->y -w_y0 + Kp*e_y + eInt_y;
     w_zK = gyro->z -w_z0 + Kp*e_z + eInt_z;
+    
+    cup0 = s-0.5*(w_xK*x + w_yK*y + w_zK*z)*dt;
+    cup1 = x+0.5*(w_xK*s + w_zK*y - w_yK*z)*dt;
+    cup2 = y+0.5*(w_yK*s - w_zK*x + w_xK*z)*dt;
+    cup3 = z+0.5*(w_zK*s + w_yK*x - w_xK*y)*dt;
+    norm = invSqrt(cup0*cup0 + cup1*cup1 + cup2*cup2 + cup3*cup3);
+
+    s = cup0 * norm;
+    x = cup1 * norm;
+    y = cup2 * norm;
+    z = cup3 * norm;
+    
+    QtoE();
 }
 /*
 //卡尔曼滤波 _(:з」∠)_
@@ -154,9 +154,7 @@ float *AHRS(float *pwm, Mpu9255_Data *accel, Mpu9255_Data *gyro, float nrf[], PI
     th_set[1] = nrf[2];
     th_set[2] = 0;
     
-    COM_FILT(accel, gyro);
-    updata();
-    QtoE();
+    Mahony(accel, gyro,0.01);
     
     th[0] = pitch;
     th[1] = roll;
