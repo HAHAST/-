@@ -154,7 +154,8 @@ float *AHRS(float *pwm, Mpu9255_Data *accel, Mpu9255_Data *gyro, float nrf[], PI
     th_set[1] = nrf[2];
     th_set[2] = 0;
     
-    Mahony(accel, gyro,0.01);
+    Mahony(accel, gyro, 0.01);
+	
     
     th[0] = pitch;
     th[1] = roll;
