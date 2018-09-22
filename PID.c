@@ -1,3 +1,4 @@
+#include "PID.h"
 
 //PID算法
 float PID(float set, float actual, PIDparameter *haha){
