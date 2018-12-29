@@ -16,8 +16,8 @@ typedef struct sizhouPID_Data_struct{
 }sizhou_PID_parameter;
 
 
-void sizhou_pidout(PID_Data *pos_rel, PID_Data *pos_val, PID_Data *pos_set, float *pid_int_limts, sizhou_PID_parameter *sizhou_pid_PosPar);
-void sizhou_pidinn(PID_Data *ang_rel, PID_Data *ang_val, PID_Data *ang_set, float *pid_int_limts, sizhou_PID_parameter *sizhou_pid_AngPar);
+void sizhou_pidout(PID_Data *pos_rel, PID_Data *pos_val, PID_Data *pos_set, float pid_int_limts[], sizhou_PID_parameter *sizhou_pid_PosPar);
+void sizhou_pidinn(PID_Data *ang_rel, PID_Data *ang_val, PID_Data *ang_set, float pid_int_limts[], sizhou_PID_parameter *sizhou_pid_AngPar);
 
 
 #endif
